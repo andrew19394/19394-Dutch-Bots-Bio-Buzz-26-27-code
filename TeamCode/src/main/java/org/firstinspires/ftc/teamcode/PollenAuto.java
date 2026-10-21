@@ -1,44 +1,66 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.pedropathing.api.Paths;
 import com.pedropathing.ivy.Command;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.pedropathing.follower.Follower;
+
+import org.firstinspires.ftc.teamcode.Teleop.flywheel;
+import org.firstinspires.ftc.teamcode.Teleop.intake;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
-import static com.pedropathing.api.Paths.*;
 import com.pedropathing.paths.Path;
 import com.pedropathing.ivy.Scheduler;
-import com.qualcomm.robotcore.robocol.TelemetryMessage;
 
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.instant;
+import static com.pedropathing.ivy.commands.Commands.waitMs;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+
+@Autonomous
 
 public class PollenAuto extends OpMode {
 
     private Follower follower;
-    private final PoseFactory p = PoseFactory.degrees();
+    private intake intake;
+    private flywheel shooter;
+    private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose startPose = p.of(24, 24, 0);
-    private final Pose scorePose = p.of(48, 48, 90);
-    private final Pose parkPose = p.of(48, 48, 90);
+    private final Pose start = poseFactory.of(59, 9, 90);
+    private final Pose starttoScore = poseFactory.of(59, 25, 90);
+    private final Pose scoretoParkStart = poseFactory.of(59, 25, 90);
+    private final Pose scoretoPark = poseFactory.of(59, 110, 90);
+    private final Pose parkStart = poseFactory.of(59, 110, 90);
+    private final Pose park = poseFactory.of(10, 120, 360);
 
-    //poses from before
-
-    private Path startToScore() {
-        return line(startPose, scorePose).linear(startPose, scorePose);
+    public Path starttoScore() {
+        return Paths.line(start, starttoScore).linear(start, starttoScore);
     }
 
-    private Path park(){
-        return line(scorePose, parkPose).linear(scorePose, parkPose);
+    public Path scoretoPark() {
+        return Paths.line(scoretoParkStart, scoretoPark).linear(scoretoParkStart, scoretoPark);
     }
+
+    public Path park() {
+        return Paths.line(parkStart, park).linear(parkStart, park);
+    }
+
 
     private Command autoRoutine() {
         return sequential(
-                follow(follower, startToScore()),
-                // Add mechanism commands here.
+                follow(follower, starttoScore()),
+
+                instant(() -> shooter.flywheelPower(1.0)),
+                instant(() -> intake.intakePower(1.0)),
+                waitMs(3000),
+                instant(() -> shooter.flywheelPower(0.0)),
+                instant(() -> intake.intakePower(0.0)),
+
+                follow(follower, scoretoPark()),
+
                 follow(follower, park())
         );
     }
@@ -46,14 +68,15 @@ public class PollenAuto extends OpMode {
     @Override
     public void init() {
         Scheduler.reset();
-
+        intake = new intake(hardwareMap);
+        shooter = new flywheel(hardwareMap);
         follower = Constants.create(hardwareMap);
-        follower.setPose(startPose);
+        follower.setPose(start);
         follower.update();
     }
     @Override
     public void start() {
-        schedule(follow(follower, park()));
+        schedule(autoRoutine());
     }
     @Override
     public void loop() {

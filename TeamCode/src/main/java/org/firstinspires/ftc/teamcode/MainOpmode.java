@@ -48,7 +48,7 @@ public class MainOpmode extends OpMode {
         }
 
         if (gamepad2.x) {
-            shooter.flywheelPower(1);
+            shooter.flywheelPower(0.7);
         } else if (gamepad2.b) {
             shooter.flywheelPower(-0.2);
         } else {
