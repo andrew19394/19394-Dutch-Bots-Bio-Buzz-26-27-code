@@ -53,11 +53,12 @@ public class PollenAuto extends OpMode {
         return sequential(
                 follow(follower, starttoScore()),
 
-                instant(() -> shooter.flywheelPower(1.0)),
-                instant(() -> intake.intakePower(1.0)),
-                waitMs(3000),
+                instant(() -> shooter.flywheelPower(0.70)),
+                waitMs(2000),
+                instant(() -> shooter.shoot(1.0,0.3)),
+                waitMs(5000),
                 instant(() -> shooter.flywheelPower(0.0)),
-                instant(() -> intake.intakePower(0.0)),
+                instant(() -> shooter.shoot(0.95,0)),
 
                 follow(follower, scoretoPark()),
 
