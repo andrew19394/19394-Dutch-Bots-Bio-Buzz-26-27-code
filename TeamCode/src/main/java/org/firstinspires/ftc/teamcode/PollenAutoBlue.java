@@ -29,11 +29,11 @@ public class PollenAutoBlue extends OpMode {
     private flywheel shooter;
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(84, 130, 270);
-    private final Pose starttoScore = poseFactory.of(84, 110, 270);
-    private final Pose scoreToParkStart = poseFactory.of(84, 110, 270);
-    private final Pose scoreToPark = poseFactory.of(84, 26, 270);
-    private final Pose parktoParkStart = poseFactory.of(84, 26, 270);
+    private final Pose start = poseFactory.of(84, 130, 90);
+    private final Pose starttoScore = poseFactory.of(84, 125, 90);
+    private final Pose scoreToParkStart = poseFactory.of(84, 125, 90);
+    private final Pose scoreToPark = poseFactory.of(84, 26, 90);
+    private final Pose parktoParkStart = poseFactory.of(84, 26, 90);
     private final Pose parktoPark = poseFactory.of(130, 24, 180);
 
     public Path starttoScore() {
@@ -53,11 +53,11 @@ public class PollenAutoBlue extends OpMode {
         return sequential(
                 follow(follower, starttoScore()),
 
-                instant(() -> shooter.flywheelPower(0.70)),
+                instant(() -> shooter.setVelocity(1600)),
                 waitMs(2000),
-                instant(() -> shooter.shoot(1.0,.3)),
+                instant(() -> shooter.shoot(0.98,.5)),
                 waitMs(5000),
-                instant(() -> shooter.flywheelPower(0.0)),
+                instant(() -> shooter.setVelocity(0)),
                 instant(() -> shooter.shoot(0.95,0)),
 
                 follow(follower, scoreToPark()),
@@ -83,5 +83,10 @@ public class PollenAutoBlue extends OpMode {
     public void loop() {
         follower.update();
         Scheduler.execute();
+    }
+
+    @Override
+    public void stop() {
+        OpModeStorage.autonomousEndPose = follower.pose(); //saves your position in that file
     }
 }

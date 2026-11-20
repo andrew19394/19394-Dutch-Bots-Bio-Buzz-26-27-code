@@ -33,7 +33,14 @@ public class MainOpmode extends OpMode {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose BlueRight = poseFactory.of(83, 114, 270);
+    private final Pose BlueTop = poseFactory.of(121, 13, 136);
+
+    private final Pose BlueBottom = poseFactory.of(126, 127, 216);
+
+    private final Pose RedBottom = poseFactory.of(19, 13, 36);
+
+    private final Pose RedTop = poseFactory.of(19, 127, 270);
+
 
     private boolean isAutoDriving = false;
     private Command followCmd;
@@ -44,6 +51,7 @@ public class MainOpmode extends OpMode {
         intake = new intake(hardwareMap);
         shooter = new flywheel(hardwareMap);
         follower = Constants.create(hardwareMap);
+        follower.setPose(OpModeStorage.autonomousEndPose);
     }
 
 
@@ -72,15 +80,46 @@ public class MainOpmode extends OpMode {
             follower.stop();
         }
 
-        // Trigger Auto Drive to BlueRight Pose using Button A
-        if (gamepad1.a && !isAutoDriving) {
-            Path pathToScore = Paths.line(robotPose, BlueRight)
-                    .linear(robotPose, BlueRight);
+        // Trigger Auto Drive to BlueTop Pose using Button dpad right
+        if (gamepad1.dpad_right && !isAutoDriving) {
+            Path pathToScore = Paths.line(robotPose, BlueTop)
+                    .linear(robotPose, BlueTop);
 
             followCmd = follow(follower, pathToScore);
             schedule(followCmd);
             isAutoDriving = true;
         }
+
+        // Trigger Auto Drive to BlueBottom Pose using Button dpad left
+        if (gamepad1.dpad_left && !isAutoDriving) {
+            Path pathToScore = Paths.line(robotPose, BlueBottom)
+                    .linear(robotPose, BlueBottom);
+
+            followCmd = follow(follower, pathToScore);
+            schedule(followCmd);
+            isAutoDriving = true;
+        }
+
+        // Trigger Auto Drive to RedTop Pose using Button dpad up
+        if (gamepad1.dpad_up && !isAutoDriving) {
+            Path pathToScore = Paths.line(robotPose, RedTop)
+                    .linear(robotPose, RedTop);
+
+            followCmd = follow(follower, pathToScore);
+            schedule(followCmd);
+            isAutoDriving = true;
+        }
+
+        // Trigger Auto Drive to RedBottom Pose using Button dpad down
+        if (gamepad1.dpad_down && !isAutoDriving) {
+            Path pathToScore = Paths.line(robotPose, RedBottom)
+                    .linear(robotPose, RedBottom);
+
+            followCmd = follow(follower, pathToScore);
+            schedule(followCmd);
+            isAutoDriving = true;
+        }
+
 
         // Control Switching & Safe Handover
         if (isAutoDriving) {
@@ -95,36 +134,41 @@ public class MainOpmode extends OpMode {
         }
 
         if (gamepad1.left_bumper || gamepad2.left_bumper) {
-            intake.intakePower(1);
+            intake.intakePower(0.8);
         } else if (gamepad1.right_bumper || gamepad2.right_bumper) {
             intake.intakePower(-0.5);
-        } else {
+        }
+        else {
             intake.intakePower(0);
         }
 
+        // Launcher speed code
+        // Max is 2120
         if (gamepad2.x) {
-            shooter.flywheelPower(0.70);
+            shooter.setVelocity(1600);
         } else if (gamepad2.b) {
-            shooter.flywheelPower(-0.5);
-            shooter.angle(1);
-        } else {
-            shooter.flywheelPower(0);
+            shooter.setVelocity(1550);
+        }else if (gamepad2.a) {
+            shooter.setVelocity(1500);
+        }
+        else {
+            shooter.setVelocity(0);
         }
 
         if (gamepad2.dpad_up) {
-            shooter.shoot(1,0.3);
-
-        } else {
-            shooter.shoot(0.94,0);
+            shooter.shoot(.98, 0.5);
+        }else {
+            shooter.angle(.95);
         }
 
-        // Pose override
+        // Pose override in red garden
         if (gamepad1.startWasPressed()) {
             Pose cornerPose = new Pose(10.5, 10.5, Math.toRadians(90));
             follower.setPose(cornerPose);
         }
 
-
+        shooter.updateFeedforward();
+        shooter.updateTelemetryLaucncher(telemetry);
         telemetry.addData("Robot X", robotPose.x());
         telemetry.addData("Robot Y", robotPose.y());
         telemetry.addData("Robot Heading", Math.toDegrees(robotPose.heading()));

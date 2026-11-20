@@ -57,4 +57,9 @@ public class LeaveRed extends OpMode {
         follower.update();
         Scheduler.execute();
     }
+
+    @Override
+    public void stop() {
+        OpModeStorage.autonomousEndPose = follower.pose(); //saves your position in that file
+    }
 }

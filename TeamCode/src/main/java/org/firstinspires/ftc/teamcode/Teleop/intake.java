@@ -11,7 +11,7 @@ public class intake {
     public intake(HardwareMap hwMap) {
         front_intake = hwMap.get(DcMotor.class, "intake");
         front_intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        front_intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        front_intake.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public void intakePower(double intake1) {
