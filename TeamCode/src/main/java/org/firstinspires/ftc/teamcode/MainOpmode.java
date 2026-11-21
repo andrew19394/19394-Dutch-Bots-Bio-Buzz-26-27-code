@@ -33,13 +33,25 @@ public class MainOpmode extends OpMode {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose BlueTop = poseFactory.of(121, 13, 136);
+    private final Pose BlueBottom = poseFactory.of(122, 19, 320);
 
-    private final Pose BlueBottom = poseFactory.of(126, 127, 216);
+    private final Pose BlueTop = poseFactory.of(123, 123, 44);
 
-    private final Pose RedBottom = poseFactory.of(19, 13, 36);
+    private final Pose RedBottom = poseFactory.of(22, 22, 216);
 
-    private final Pose RedTop = poseFactory.of(19, 127, 270);
+    private final Pose RedTop = poseFactory.of(22, 120, 142);
+
+//    private final PoseFactory poseFactory = PoseFactory.degrees();
+//
+//    private final Pose RedBottom = poseFactory.of(22, 22, 216);
+//    private final Pose RedTop    = poseFactory.of(22, 120, 142);
+//
+//
+//    private final PoseFactory blueFactory = PoseFactory.degrees().mirrorX(70.75);
+//
+//
+//    private final Pose BlueBottom = blueFactory.of(22, 22, 216);
+//    private final Pose BlueTop    = blueFactory.of(22, 120, 142);
 
 
     private boolean isAutoDriving = false;
@@ -101,7 +113,7 @@ public class MainOpmode extends OpMode {
         }
 
         // Trigger Auto Drive to RedTop Pose using Button dpad up
-        if (gamepad1.dpad_up && !isAutoDriving) {
+        if (gamepad1.x && !isAutoDriving) {
             Path pathToScore = Paths.line(robotPose, RedTop)
                     .linear(robotPose, RedTop);
 
@@ -111,7 +123,7 @@ public class MainOpmode extends OpMode {
         }
 
         // Trigger Auto Drive to RedBottom Pose using Button dpad down
-        if (gamepad1.dpad_down && !isAutoDriving) {
+        if (gamepad1.b && !isAutoDriving) {
             Path pathToScore = Paths.line(robotPose, RedBottom)
                     .linear(robotPose, RedBottom);
 
@@ -136,7 +148,7 @@ public class MainOpmode extends OpMode {
         if (gamepad1.left_bumper || gamepad2.left_bumper) {
             intake.intakePower(0.8);
         } else if (gamepad1.right_bumper || gamepad2.right_bumper) {
-            intake.intakePower(-0.5);
+            intake.intakePower(-0.6);
         }
         else {
             intake.intakePower(0);
@@ -156,22 +168,22 @@ public class MainOpmode extends OpMode {
         }
 
         if (gamepad2.dpad_up) {
-            shooter.shoot(.98, 0.5);
+            shooter.shoot(.98, 0.50);
         }else {
             shooter.angle(.95);
         }
 
         // Pose override in red garden
-        if (gamepad1.startWasPressed()) {
-            Pose cornerPose = new Pose(10.5, 10.5, Math.toRadians(90));
+        if (gamepad1.yWasPressed()) {
+            Pose cornerPose = new Pose(8.5, 8.5, Math.toRadians(90));
             follower.setPose(cornerPose);
         }
 
-        shooter.updateFeedforward();
-        shooter.updateTelemetryLaucncher(telemetry);
         telemetry.addData("Robot X", robotPose.x());
         telemetry.addData("Robot Y", robotPose.y());
         telemetry.addData("Robot Heading", Math.toDegrees(robotPose.heading()));
+        shooter.updateFeedforward();
+        shooter.updateTelemetryLaucncher(telemetry);
     }
 }
 

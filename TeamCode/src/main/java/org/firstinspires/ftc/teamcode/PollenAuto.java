@@ -53,10 +53,10 @@ public class PollenAuto extends OpMode {
         return sequential(
                 follow(follower, starttoScore()),
 
-                instant(() -> shooter.setVelocity(1600)),
+                instant(() -> shooter.setVelocity(1500)),
                 waitMs(2000),
                 instant(() -> shooter.shoot(0.98,0.5)),
-                waitMs(5000),
+                waitMs(3000),
                 instant(() -> shooter.setVelocity(0)),
                 instant(() -> shooter.shoot(0.95,0)),
 
@@ -83,6 +83,7 @@ public class PollenAuto extends OpMode {
     public void loop() {
         follower.update();
         Scheduler.execute();
+        shooter.updateFeedforward();
     }
 
     @Override
